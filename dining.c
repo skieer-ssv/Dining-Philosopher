@@ -16,6 +16,45 @@ sem_t mutex;
 sem_t S[N];
 sem_t app,main_course,desert;
 
+void test(int phnum);
+void take_fork(int phnum);
+void put_fork(int phnum);
+void* philospher(void* num);
+
+int main()
+{ 	int i;
+	printf("\nEnter names of philosophers: ");
+	for(i=0;i<N;i++)
+	{
+		scanf("%s",name[i]);
+	}
+	printf("\nPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
+
+	pthread_t thread_id[N];
+
+	// initialize the semaphores
+	sem_init(&mutex, 0, 1);
+	for (i = 0; i < N; i++)
+
+		sem_init(&S[i], 0, 0);
+
+	for (i = 0; i < N; i++) {
+
+		// create philosopher processes
+		pthread_create(&thread_id[i], NULL,
+					philospher, &phil[i]);
+
+		printf("Philosopher %s is thinking\n", name[i]);
+	}
+	//join the threads together
+	for (i = 0; i < N; i++)
+
+		pthread_join(thread_id[i], NULL);
+
+	return 0;
+}
+
+
 void test(int phnum)
 {
 	if (state[phnum] == HUNGRY
@@ -116,37 +155,4 @@ void* philospher(void* num)
 		//End the thread
 		pthread_exit(NULL);
 	}
-}
-
-int main()
-{ 	int i;
-	printf("\nEnter names of philosophers: ");
-	for(i=0;i<N;i++)
-	{
-		scanf("%s",name[i]);
-	}
-	printf("\nPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
-
-	pthread_t thread_id[N];
-
-	// initialize the semaphores
-	sem_init(&mutex, 0, 1);
-	for (i = 0; i < N; i++)
-
-		sem_init(&S[i], 0, 0);
-
-	for (i = 0; i < N; i++) {
-
-		// create philosopher processes
-		pthread_create(&thread_id[i], NULL,
-					philospher, &phil[i]);
-
-		printf("Philosopher %s is thinking\n", name[i]);
-	}
-	//join the threads together
-	for (i = 0; i < N; i++)
-
-		pthread_join(thread_id[i], NULL);
-
-	return 0;
 }
