@@ -9,13 +9,19 @@
 #define LEFT (phnum + 2) % N
 #define RIGHT (phnum + 1) % N
 
+//global variables
+int index;
 int state[N];
 int phil[N] = { 0, 1, 2 };
-char name[N][10];
+char name[15][10];
+pthread_t thread_id[N];
+
+//semaphores
 sem_t mutex;
 sem_t S[N];
 sem_t app,main_course,desert;
 
+//functions
 void test(int phnum);
 void take_fork(int phnum);
 void put_fork(int phnum);
@@ -23,33 +29,80 @@ void* philospher(void* num);
 
 int main()
 { 	int i;
+	int number,limit;
+
+	printf("\nEnter no. of philosophers: ");
+	scanf("%d",&number);
+
+	limit=number;
 	printf("\nEnter names of philosophers: ");
-	for(i=0;i<N;i++)
+	for(i=0;i<number;i++)
 	{
-		scanf("%s",name[i]);
+		scanf("%s ",name[i]);
+
 	}
+
+	printf("\nWe can only serve three people at a time");
+
 	printf("\nPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
+	while(number>=N)
+	{
+		index=limit-number;
+		//printf("\n\nIndex changed to: %d\n\n",index);
+		printf("\nCurrently serving philosophers: ");
+		for (i=0;i<N;i++)
+			printf("%s",name[index+i]);
+		printf("\n");
+		// initialize the semaphores
+		sem_init(&mutex, 0, 1);
+		for (i = 0; i < N; i++)
 
-	pthread_t thread_id[N];
+			sem_init(&S[index+i], 0, 0);
 
-	// initialize the semaphores
-	sem_init(&mutex, 0, 1);
-	for (i = 0; i < N; i++)
+		for (i = 0; i < N; i++) {
 
-		sem_init(&S[i], 0, 0);
+			// create philosopher processes
+			pthread_create(&thread_id[i], NULL,
+						philospher, &phil[i]);
 
-	for (i = 0; i < N; i++) {
+			printf("Philosopher %s is siting\n", name[index+i]);
+		}
+		//join the threads together
+		for (i = 0; i < N; i++)
+			pthread_join(thread_id[i], NULL);
 
-		// create philosopher processes
-		pthread_create(&thread_id[i], NULL,
-					philospher, &phil[i]);
-
-		printf("Philosopher %s is thinking\n", name[i]);
+		number-=N;
 	}
-	//join the threads together
-	for (i = 0; i < N; i++)
 
-		pthread_join(thread_id[i], NULL);
+
+	if (number>0)
+	{
+		index=limit-number;
+		//printf("\n\nIndex changed to: %d\n\n",index);
+		printf("\nCurrently serving philosophers: ");
+		for (i=0;i<number;i++)
+			printf("%s",name[index+i]);
+		printf("\n");
+		// initialize the semaphores
+		sem_init(&mutex, 0, 1);
+		for (i = 0; i < number; i++)
+
+			sem_init(&S[i], 0, 0);
+
+		for (i = 0; i < number; i++)
+		{
+			// create philosopher processes
+			pthread_create(&thread_id[i], NULL,
+						philospher, &phil[i]);
+
+			printf("Philosopher %s is siting\n", name[index+i]);
+		}
+		//join the threads together
+		for (i = 0; i < number; i++)
+
+			pthread_join(thread_id[i], NULL);
+	}
+
 
 	return 0;
 }
@@ -67,9 +120,9 @@ void test(int phnum)
 		//sleep(2);
 
 		printf("Philosopher %s takes fork %d and %d\n",
-					name[phnum], LEFT + 1, phnum + 1);
+					name[index+phnum], LEFT + 1, phnum + 1);
 
-		printf("Philosopher %s is Eating\n", name[phnum] );
+		printf("Philosopher %s is Eating\n", name[index+phnum] );
 
 		// sem_post(&S[phnum]) has no effect
 		// during takefork
@@ -88,7 +141,7 @@ void take_fork(int phnum)
 	// state that hungry
 	state[phnum] = HUNGRY;
 
-	printf("Philosopher %s is Hungry\n", name[phnum]);
+	printf("Philosopher %s is Hungry\n", name[index+phnum]);
 
 	// eat if neighbours are not eating
 	test(phnum);
@@ -111,8 +164,8 @@ void put_fork(int phnum)
 	state[phnum] = THINKING;
 
 	printf("Philosopher %s putting fork %d and %d down\n",
-		name[phnum], LEFT + 1, phnum + 1);
-	printf("Philosopher %s is thinking\n", name[phnum]);
+		name[index+phnum], LEFT + 1, phnum + 1);
+	printf("Philosopher %s is thinking\n", name[index+phnum]);
 
 	test(LEFT);
 	test(RIGHT);
