@@ -41,7 +41,7 @@ int main()
 	printf("\nEnter names of philosophers: ");
 	for(i=0;i<number;i++)
 	{
-		scanf("%s ",&name[i]);
+		scanf("%s ",name[i]);
 
 	}
 
@@ -78,7 +78,7 @@ void serve_n_philosophers(int n)
 	sem_init(&mutex, 0, 1);
 	for (i = 0; i < n; i++)
 
-		sem_init(&S[_index+i], 0, 0);
+		sem_init(&S[i], 0, 0);
 
 	for (i = 0; i < n; i++) {
 
