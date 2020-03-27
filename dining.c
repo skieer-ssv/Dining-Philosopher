@@ -10,7 +10,7 @@
 #define RIGHT (phnum + 1) % N
 
 //global variables
-int __index,limit;
+int _index,limit;
 int state[N];
 int phil[N] = { 0, 1, 2 };
 char name[15][10];
@@ -41,7 +41,7 @@ int main()
 	printf("\nEnter names of philosophers: ");
 	for(i=0;i<number;i++)
 	{
-		scanf("%s ",name[i]);
+		scanf("%s ",&name[i]);
 
 	}
 
@@ -49,7 +49,7 @@ int main()
 	printf("\n\t\tPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
 	while(number>=N)
 	{
-		__index=limit-number;
+		_index=limit-number;
 		//Serve N philosophers
 		serve_n_philosophers(N);
 		number-=N;
@@ -58,7 +58,7 @@ int main()
 
 	if (number>0)
 	{
-		__index=limit-number;
+		_index=limit-number;
 		serve_n_philosophers(number);
 	}
 
@@ -69,16 +69,16 @@ int main()
 //function to serve n number of philosophers
 void serve_n_philosophers(int n)
 {int i;
-	//printf("\n\n__index changed to: %d\n\n",__index);
+	//printf("\n\n_index changed to: %d\n\n",_index);
 	printf("\nCurrently serving philosophers: ");
 	for (i=0;i<n;i++)
-		printf("%s",name[__index+i]);
+		printf("%s",name[_index+i]);
 	printf("\n");
 	// initialize the semaphores
 	sem_init(&mutex, 0, 1);
 	for (i = 0; i < n; i++)
 
-		sem_init(&S[__index+i], 0, 0);
+		sem_init(&S[_index+i], 0, 0);
 
 	for (i = 0; i < n; i++) {
 
@@ -86,7 +86,7 @@ void serve_n_philosophers(int n)
 		pthread_create(&thread_id[i], NULL,
 					philospher, &phil[i]);
 
-		printf("Philosopher %s is siting\n", name[__index+i]);
+		printf("Philosopher %s is siting\n", name[_index+i]);
 	}
 	//join the threads together
 	for (i = 0; i < n; i++)
@@ -103,7 +103,7 @@ void* philospher(void* num)
 
 		sleep(1);
 		//Appetiser
-		printf("Appetiser is served to philosopher %s\n",name[index+*i]);
+		printf("Appetiser is served to philosopher %s\n",name[_index+*i]);
 		take_fork(*i);
 		sleep(0);
 		put_fork(*i);
@@ -112,7 +112,7 @@ void* philospher(void* num)
 
 		sleep(1);
 		//Main Course
-		printf("Main Course is served to philosopher %s\n",name[index+*i]);
+		printf("Main Course is served to philosopher %s\n",name[_index+*i]);
 		take_fork(*i);
 		sleep(0);
 		put_fork(*i);
@@ -121,7 +121,7 @@ void* philospher(void* num)
 
 		sleep(1);
 		//Desert
-		printf("Desert is served to philosopher %s\n",name[index+*i]);
+		printf("Desert is served to philosopher %s\n",name[_index+*i]);
 		take_fork(*i);
 		sleep(0);
 		put_fork(*i);
@@ -144,9 +144,9 @@ void test(int phnum)
 		//sleep(2);
 
 		printf("Philosopher %s takes fork %d and %d\n",
-					name[__index+phnum], LEFT + 1, phnum + 1);
+					name[_index+phnum], LEFT + 1, phnum + 1);
 
-		printf("Philosopher %s is Eating\n", name[__index+phnum] );
+		printf("Philosopher %s is Eating\n", name[_index+phnum] );
 
 		// sem_post(&S[phnum]) has no effect
 		// during takefork
@@ -165,7 +165,7 @@ void take_fork(int phnum)
 	// state that hungry
 	state[phnum] = HUNGRY;
 
-	printf("Philosopher %s is Hungry\n", name[__index+phnum]);
+	printf("Philosopher %s is Hungry\n", name[_index+phnum]);
 
 	// eat if neighbours are not eating
 	test(phnum);
@@ -188,8 +188,8 @@ void put_fork(int phnum)
 	state[phnum] = THINKING;
 
 	printf("Philosopher %s putting fork %d and %d down\n",
-		name[__index+phnum], LEFT + 1, phnum + 1);
-	printf("Philosopher %s is thinking\n", name[__index+phnum]);
+		name[_index+phnum], LEFT + 1, phnum + 1);
+	printf("Philosopher %s is thinking\n", name[_index+phnum]);
 
 	test(LEFT);
 	test(RIGHT);
