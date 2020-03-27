@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
-#include<unistd.h>
+#include <unistd.h>
 #define N 3
 #define THINKING 2
 #define HUNGRY 1
@@ -10,7 +10,7 @@
 #define RIGHT (phnum + 1) % N
 
 //global variables
-int index;
+int index,limit;
 int state[N];
 int phil[N] = { 0, 1, 2 };
 char name[15][10];
@@ -26,15 +26,19 @@ void test(int phnum);
 void take_fork(int phnum);
 void put_fork(int phnum);
 void* philospher(void* num);
+void serve_n_philosophers(int n);
 
 int main()
-{ 	int i;
-	int number,limit;
+{
+	int i;
+	int number;
 
 	printf("\nEnter no. of philosophers: ");
 	scanf("%d",&number);
 
 	limit=number;
+
+	//taking names of philosophers
 	printf("\nEnter names of philosophers: ");
 	for(i=0;i<number;i++)
 	{
@@ -43,34 +47,12 @@ int main()
 	}
 
 	printf("\nWe can only serve three people at a time");
-
-	printf("\nPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
+	printf("\n\t\tPhilosophers will be served 3 dishes(Appetiser, Main Course, Desert)\n");
 	while(number>=N)
 	{
 		index=limit-number;
-		//printf("\n\nIndex changed to: %d\n\n",index);
-		printf("\nCurrently serving philosophers: ");
-		for (i=0;i<N;i++)
-			printf("%s",name[index+i]);
-		printf("\n");
-		// initialize the semaphores
-		sem_init(&mutex, 0, 1);
-		for (i = 0; i < N; i++)
-
-			sem_init(&S[index+i], 0, 0);
-
-		for (i = 0; i < N; i++) {
-
-			// create philosopher processes
-			pthread_create(&thread_id[i], NULL,
-						philospher, &phil[i]);
-
-			printf("Philosopher %s is siting\n", name[index+i]);
-		}
-		//join the threads together
-		for (i = 0; i < N; i++)
-			pthread_join(thread_id[i], NULL);
-
+		//Serve N philosophers
+		serve_n_philosophers(N);
 		number-=N;
 	}
 
@@ -78,33 +60,76 @@ int main()
 	if (number>0)
 	{
 		index=limit-number;
-		//printf("\n\nIndex changed to: %d\n\n",index);
-		printf("\nCurrently serving philosophers: ");
-		for (i=0;i<number;i++)
-			printf("%s",name[index+i]);
-		printf("\n");
-		// initialize the semaphores
-		sem_init(&mutex, 0, 1);
-		for (i = 0; i < number; i++)
-
-			sem_init(&S[i], 0, 0);
-
-		for (i = 0; i < number; i++)
-		{
-			// create philosopher processes
-			pthread_create(&thread_id[i], NULL,
-						philospher, &phil[i]);
-
-			printf("Philosopher %s is siting\n", name[index+i]);
-		}
-		//join the threads together
-		for (i = 0; i < number; i++)
-
-			pthread_join(thread_id[i], NULL);
+		serve_n_philosophers(number);
 	}
 
-
 	return 0;
+}
+//end of main
+
+//function to serve n number of philosophers
+void serve_n_philosophers(int n)
+{
+	//printf("\n\nIndex changed to: %d\n\n",index);
+	printf("\nCurrently serving philosophers: ");
+	for (i=0;i<n;i++)
+		printf("%s",name[index+i]);
+	printf("\n");
+	// initialize the semaphores
+	sem_init(&mutex, 0, 1);
+	for (i = 0; i < n; i++)
+
+		sem_init(&S[index+i], 0, 0);
+
+	for (i = 0; i < n; i++) {
+
+		// create philosopher processes
+		pthread_create(&thread_id[i], NULL,
+					philospher, &phil[i]);
+
+		printf("Philosopher %s is siting\n", name[index+i]);
+	}
+	//join the threads together
+	for (i = 0; i < n; i++)
+		pthread_join(thread_id[i], NULL);
+}
+
+//standard algorithm for dining philospher
+void* philospher(void* num)
+{
+
+	while (1) {
+
+		int* i = num;
+
+		sleep(1);
+		//Appetiser
+		printf("Appetiser is served to philosopher %s\n",name[*i]);
+		take_fork(*i);
+		sleep(0);
+		put_fork(*i);
+
+
+
+		sleep(1);
+		//Main Course
+		printf("Main Course is served to philosopher %s\n",name[*i]);
+		take_fork(*i);
+		sleep(0);
+		put_fork(*i);
+
+
+
+		sleep(1);
+		//Desert
+		printf("Desert is served to philosopher %s\n",name[*i]);
+		take_fork(*i);
+		sleep(0);
+		put_fork(*i);
+
+		//End the thread
+		pthread_exit(NULL);
+	}
 }
 
 
@@ -171,41 +196,4 @@ void put_fork(int phnum)
 	test(RIGHT);
 
 	sem_post(&mutex);
-}
-
-void* philospher(void* num)
-{
-
-	while (1) {
-
-		int* i = num;
-
-		sleep(1);
-		//Appetiser
-		printf("Appetiser is served to philosopher %s\n",name[*i]);
-		take_fork(*i);
-		sleep(0);
-		put_fork(*i);
-
-
-
-		sleep(1);
-		//Main Course
-		printf("Main Course is served to philosopher %s\n",name[*i]);
-		take_fork(*i);
-		sleep(0);
-		put_fork(*i);
-
-
-
-		sleep(1);
-		//Desert
-		printf("Desert is served to philosopher %s\n",name[*i]);
-		take_fork(*i);
-		sleep(0);
-		put_fork(*i);
-
-		//End the thread
-		pthread_exit(NULL);
-	}
 }
