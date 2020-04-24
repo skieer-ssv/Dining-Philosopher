@@ -18,7 +18,7 @@ int state[N];
 int phil[N] = { 0, 1, 2, 3, 4};
 char name[15][10];
 pthread_t thread_id[N];
-int status[N][10];
+
 
 //semaphores
 sem_t mutex;
@@ -52,21 +52,17 @@ int main()
 
 	}
 
-	printf("\nWe can only serve five people at a time");
-	printf("\n\t\tPhilosophers will be served Noodles\n");
+	printf("\n\t\t\t\tWE CAN ONLY SERVE %d PHILOSOPHERS AT A TIME",N);
+	printf("\n\t\t\t\tPHILOSOPHERS WILL BE SERVED NOODLES\n");
 	while(number>=N)
 	{
 		_index=limit-number;
 		//Serve N philosophers
 		clean_table();
-		printf("\nThis is served table*************************************\n");
-		printTable();
 		serve_n_philosophers(N);
 		number-=N;
-		clean_table();
-		printf("\nThis is AFTER served table*************************************\n");
 		printTable();
-
+		clean_table();
 	}
 
 
@@ -74,10 +70,9 @@ int main()
 	{
 		_index=limit-number;
 
-		printf("\nThis is served table***************************\n");
-		printTable();
-		serve_n_philosophers(number);
 
+		serve_n_philosophers(number);
+printTable();
 	}
 
 	return 0;
@@ -89,10 +84,10 @@ void serve_n_philosophers(int n)
 {int i;
 
 	//printf("\n\n_index changed to: %d\n\n",_index);
-	printf("\nCurrently serving philosophers: ");
+	printf("\nCURRENTLY SERVING PHILOSOPHERS: ");
 	for (i=0;i<n;i++)
 		printf(" %d |%s|",i+1,name[_index+i]);
-	printf(" 1\n");
+	printf(" 1\n\n");
 	// initialize the semaphores
 	sem_init(&mutex, 0, 1);
 
@@ -201,8 +196,8 @@ void put_fork(int phnum)
 
 void printTable()
 {
-	for(int i=0; i<N ; i++ ){
-
+	for(int i=0; i<N ; i++ )
+	{
 		printf("|%s|\t",name[_index+i]);
 	}
 	printf("\n");
@@ -222,11 +217,7 @@ void printTable()
 
 void clean_table()
 {
-	for(int i; i<N; i++)
-		{state[i]=EMPTY;
-	printf("%d",state[i]);
-}
-	// for(int i; i<N; i++)
-	// 	printf("%d",state[i]);
+	for(int i=0; i<N; i++)
+		state[i]=EMPTY;
 
 }
