@@ -118,7 +118,7 @@ void* philospher(void* num)
 
 		sleep(1);
 		//Noodles
-		printf("Noodle is served to philosopher %s\n",name[_index+*i]);
+		//printf("Noodle is served to philosopher %s\n",name[_index+*i]);
 		take_fork(*i);
 		sleep(0);
 		put_fork(*i);
