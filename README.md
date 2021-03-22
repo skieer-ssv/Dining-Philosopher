@@ -1,7 +1,7 @@
 # Dining-Philosopher
 This is a c program using multithreading and semaphores to solve classic dining philosophers problem.
 
-Note: pthread functionality is used for threading in this program which is natively available in linux.
+Note: pthread functionality is used for threading in this program which is natively available in linux OS.
 
 Additional features:
 1. Introduced a three course meals for the philosophers
