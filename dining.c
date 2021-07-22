@@ -16,7 +16,7 @@
 int _index,limit;
 int state[N];
 int phil[N] = { 0, 1, 2, 3, 4};
-char name[15][10];
+char name[50][20];
 pthread_t thread_id[N];
 
 
@@ -48,8 +48,8 @@ int main()
 	printf("\nEnter names of philosophers: ");
 	for(i=0;i<number;i++)
 	{
-		scanf("%s ",name[i]);
-
+		scanf("%19s",&name[i]);
+while ((c = fgetc(stdin)) != '\n' && c != EOF); /* Flush stdin */
 	}
 
 	printf("\n\t\t\t\tWE CAN ONLY SERVE %d PHILOSOPHERS AT A TIME",N);
